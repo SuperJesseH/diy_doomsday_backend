@@ -15,12 +15,6 @@ five38 = Dataset.create(name: "Presidential Approval", src: 'https://projects.fi
 
 five38_2 = Dataset.create(name: "Generic ballot", src: 'https://projects.fivethirtyeight.com/generic-ballot-data/generic_topline.csv', desc:"generic ballot reps vs dems", normalizer:"percent")
 
-
-t.integer :user_id
-t.integer :dataset_id
-t.float :weight
-t.string :notes
-
 dandata1 = UserDataset.create(user_id: user1.id, dataset_id: five38.id, weight: 0.25)
 dandata2 = UserDataset.create(user_id: user1.id, dataset_id: five38_2.id, weight: 0.35)
 amydata1 = UserDataset.create(user_id: user2.id, dataset_id: five38.id, weight: 0.15)

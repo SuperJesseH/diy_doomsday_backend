@@ -1,5 +1,4 @@
-class Api::V1::UserDatasetController < ApplicationController
-
+class Api::V1::UsersController < ApplicationController
   def index
     #grab all users
     @users = User.all
