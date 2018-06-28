@@ -7,8 +7,8 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 
-user1 = User.create(name: "dan", email: "dan@email.com")
-user2 = User.create(name: "amy", email: "amy@email.com")
+user1 = User.create(name: "dan", email: "dan@email.com", password: "password")
+user2 = User.create(name: "amy", email: "amy@email.com", password "password")
 
 
 five38 = Dataset.create(name: "Presidential Approval", src: 'https://projects.fivethirtyeight.com/trump-approval-data/approval_topline.csv', desc:"presidential approval figures", normalizer:"percent")

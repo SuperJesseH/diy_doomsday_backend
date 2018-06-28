@@ -2,7 +2,7 @@ class User < ApplicationRecord
 
   # Adds methods to set and authenticate against a Bcrypt password
   # requires "password_digest" in user schema/migration
-  # has_secure_password
+  has_secure_password
 
   # sets up relationships
   has_many :user_datasets

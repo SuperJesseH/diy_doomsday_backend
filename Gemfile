@@ -46,3 +46,6 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 #jwt for authentication - token generation / validation
 gem 'jwt'
+
+#to keep my secrets secret (keys)
+gem 'dotenv-rails'
