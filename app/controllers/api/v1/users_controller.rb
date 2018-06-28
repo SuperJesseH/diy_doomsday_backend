@@ -17,14 +17,14 @@ class Api::V1::UsersController < ApplicationController
     if (@user.save)
 
       payload = {
-        name: @user.name
-        email: @user.email
+        name: @user.name,
+        email: @user.email,
         id: @user.id
       }
 
       token = JWT.encode payload, ENV['JWT_SECRET'], 'HS256'
 
-      render json{
+      render json: {
         token: token,
         id: @user.id
        }
@@ -32,7 +32,6 @@ class Api::V1::UsersController < ApplicationController
     else
       render json: {
         errors: @user.errors.full_messages}, status: :unprocessable_entity
-      }
     end
   end
 
@@ -42,7 +41,7 @@ class Api::V1::UsersController < ApplicationController
     params.permit(
       :name,
       :email,
-      :password
+      :password,
       :notes
     )
   end
