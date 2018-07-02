@@ -17,7 +17,8 @@ ActiveRecord::Schema.define(version: 2018_06_27_134649) do
 
   create_table "datasets", force: :cascade do |t|
     t.string "name"
-    t.string "src"
+    t.string "srcName"
+    t.string "srcAddress"
     t.string "desc"
     t.string "normalizer"
     t.string "notes"
