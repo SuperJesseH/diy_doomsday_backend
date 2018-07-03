@@ -16,10 +16,10 @@ class Api::V1::DataRequestsController < ApplicationController
       data = proccesPresApproval(@dataset.srcAddress)
     elsif @dataset.name == "Generic Ballot"
       data = proccesGenericBallot(@dataset.srcAddress)
-    elsif @dataset.name == "S&P 500 CAPE"
-      data = proccesSP500CAPE(@dataset.srcAddress)
-    elsif @dataset.name == "S&P 500 CAPE"
-      data = proccesSP500CAPE(@dataset.srcAddress)
+    elsif @dataset.name == "S&P 500 Volatility"
+      data = proccesFRED(@dataset.srcAddress)
+    elsif @dataset.name == "10-Year Treasury Minus 2-Year Treasury"
+      data = proccesFRED(@dataset.srcAddress)
     end
 
     render json: data
@@ -50,11 +50,15 @@ private
     data
   end
 
-  def proccesSP500CAPE(dataset)
+  def proccesFRED(dataset)
+    uri = URI.parse(dataset)
+    # Shortcut
+    response = Net::HTTP.get_response(uri)
+    valueArr = JSON response.body
+
     data = {}
-    CSV.new(open(dataset), :headers => :first_row).each do |line|
-      data[line[0]] = line[9]
-    end
+    valueArr["observations"].each{ |dataInstance| data[dataInstance["date"]] = dataInstance["value"]}
+
     data
   end
 

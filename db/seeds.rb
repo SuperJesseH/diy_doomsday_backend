@@ -15,7 +15,7 @@ five38 = Dataset.create(name: "Presidential Approval", srcName: "FiveThirtyEight
 
 five38_2 = Dataset.create(name: "Generic Ballot", srcName: "FiveThirtyEight", srcAddress: 'https://projects.fivethirtyeight.com/generic-ballot-data/generic_topline.csv', desc:"Percent of Americans indicating a prefrence for Democrat candidates", normalizer:"percent")
 
-sp1 = Dataset.create(name: "S&P 500 Volatility", srcName: "Datahub.io", srcAddress: "https://api.stlouisfed.org/fred/series/observations?series_id=VXVCLS&api_key=#{ENV['FRED_SECRET']}&file_type=json", desc:"Measures price volatility among the 500 largest publicly traded companies in the U.S.", normalizer:"percent")
+sp1 = Dataset.create(name: "S&P 500 Volatility", srcName: "FRED", srcAddress: "https://api.stlouisfed.org/fred/series/observations?series_id=VXVCLS&api_key=#{ENV['FRED_SECRET']}&file_type=json", desc:"Measures price volatility among the 500 largest publicly traded companies in the U.S.", normalizer:"percent")
 
 sp2 = Dataset.create(name: "10-Year Treasury Minus 2-Year Treasury", srcName: "FRED", srcAddress: "https://api.stlouisfed.org/fred/series/observations?series_id=T10Y2Y&api_key=#{ENV['FRED_SECRET']}&file_type=json", desc:"A high value indicates expectations for faster economic growth in the future", normalizer:"percent")
 
