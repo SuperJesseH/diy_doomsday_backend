@@ -16,8 +16,10 @@ class Api::V1::DataRequestsController < ApplicationController
       data = proccesPresApproval(@dataset.srcAddress)
     elsif @dataset.name == "Generic Ballot"
       data = proccesGenericBallot(@dataset.srcAddress)
-    elsif @dataset.name == "Generic ballot"
-      data = proccesGenericBallot(@dataset.srcAddress)
+    elsif @dataset.name == "S&P 500 CAPE"
+      data = proccesSP500CAPE(@dataset.srcAddress)
+    elsif @dataset.name == "S&P 500 CAPE"
+      data = proccesSP500CAPE(@dataset.srcAddress)
     end
 
     render json: data
@@ -47,5 +49,15 @@ private
     end
     data
   end
+
+  def proccesSP500CAPE(dataset)
+    data = {}
+    CSV.new(open(dataset), :headers => :first_row).each do |line|
+      data[line[0]] = line[9]
+    end
+    data
+  end
+
+
 
 end
