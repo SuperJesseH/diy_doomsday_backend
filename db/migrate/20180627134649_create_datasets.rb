@@ -5,6 +5,7 @@ class CreateDatasets < ActiveRecord::Migration[5.2]
       t.string :srcName
       t.string :srcAddress
       t.string :desc
+      t.string :datatype
       t.string :normalizer
       t.string :notes
 

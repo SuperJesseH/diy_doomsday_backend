@@ -3,6 +3,7 @@ class CreateUserDatasets < ActiveRecord::Migration[5.2]
     create_table :user_datasets do |t|
       t.integer :user_id
       t.integer :dataset_id
+      t.boolean :positive_corral
       t.float :weight
       t.string :notes
 

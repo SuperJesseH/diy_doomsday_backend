@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 2018_06_27_134649) do
     t.string "srcName"
     t.string "srcAddress"
     t.string "desc"
+    t.string "datatype"
     t.string "normalizer"
     t.string "notes"
     t.datetime "created_at", null: false
@@ -29,6 +30,7 @@ ActiveRecord::Schema.define(version: 2018_06_27_134649) do
   create_table "user_datasets", force: :cascade do |t|
     t.integer "user_id"
     t.integer "dataset_id"
+    t.boolean "positive_corral"
     t.float "weight"
     t.string "notes"
     t.datetime "created_at", null: false
