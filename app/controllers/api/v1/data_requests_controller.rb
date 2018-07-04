@@ -14,15 +14,19 @@ class Api::V1::DataRequestsController < ApplicationController
 
     if @dataset.name == "Presidential Approval"
       data = proccesPresApproval(@dataset.srcAddress)
+      dataPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data)}
     elsif @dataset.name == "Generic Ballot"
       data = proccesGenericBallot(@dataset.srcAddress)
+      dataPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data)}
     elsif @dataset.name == "S&P 500 Volatility"
       data = proccesFRED(@dataset.srcAddress)
+      dataPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data)}
     elsif @dataset.name == "10-Year Treasury Minus 2-Year Treasury"
       data = proccesFRED(@dataset.srcAddress)
+      dataPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data)}
     end
 
-    render json: data
+    render json: dataPackage
   end
 
   def create
@@ -37,7 +41,7 @@ private
         data[line[9]] = line[3]
       end
     end
-    data
+    data.reverse_each.to_h
   end
 
   def proccesGenericBallot(dataset)
@@ -47,19 +51,30 @@ private
         data[line[8]] = line[2]
       end
     end
-    data
+    data.reverse_each.to_h
   end
 
   def proccesFRED(dataset)
     uri = URI.parse(dataset)
-    # Shortcut
     response = Net::HTTP.get_response(uri)
     valueArr = JSON response.body
 
     data = {}
+    # check for zeros
     valueArr["observations"].each{ |dataInstance| data[dataInstance["date"]] = dataInstance["value"]}
-
     data
+  end
+
+  def getMean(data)
+    ints = data.values.map{ |val| val.to_f}
+    ints.inject{ |sum, el| sum + el }.to_f / ints.size
+  end
+
+  def getStdVar(data)
+    ints = data.values.map{ |val| val.to_f}
+    m = getMean(data)
+    sum = ints.inject(0){|accum, i| accum + (i - m) ** 2 }
+    Math.sqrt(sum / (ints.length - 1).to_f)
   end
 
 
