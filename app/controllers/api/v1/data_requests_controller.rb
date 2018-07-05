@@ -32,6 +32,8 @@ class Api::V1::DataRequestsController < ApplicationController
 
      }
 
+     byebug
+
 
 
     render json: dataPackage
