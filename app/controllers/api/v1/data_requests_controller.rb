@@ -32,10 +32,45 @@ class Api::V1::DataRequestsController < ApplicationController
 
      }
 
+    #  go to the latest day in my list of days, find that day in each of the datasets
+    #
+    #  if that day is unavalible in a specific data set look back in time untill you get a valid value and apply it
+    #
+    #  calculate stdDev for value  and save value add it to hash / array
+    #
+    #  repeat for all values
+    #
+    # go through each day and calucalte doom index with weights
+    #
+    # return array of 30 day doom index
 
 
 
-    render json: dataPackage
+    index = get31days.map{ |day|
+      indexValueSet = dataPackage.map{ |dataset|
+
+        dataRelationship = @userDatasets.find{ |userdataset| userdataset.dataset_id == dataset[:id]}
+
+        relationshipVector = (dataRelationship.positive_corral ? 1 : -1)
+
+        indexValuePartial = 0
+
+        if dataset[:data][day]
+          indexValuePartial = (((dataset[:data][day].to_f - dataset[:mean]) / dataset[:stdDev]) * dataRelationship.weight) * relationshipVector
+        else
+          (1..10).each { |index|
+             if dataset[:data][(DateTime.parse(day) - index).strftime("%d/%m/%Y")]
+               indexValuePartial =(((dataset[:data][(DateTime.parse(day) - index).strftime("%d/%m/%Y")].to_f - dataset[:mean]) / dataset[:stdDev]) * dataRelationship.weight) * relationshipVector
+               break
+            end
+          }
+        end
+        indexValuePartial
+       }
+       indexValueSet.inject(0, :+)
+     }
+
+    render json: index
   end
 
   def create
@@ -47,7 +82,7 @@ private
     data = {}
     CSV.new(open(dataset), :headers => :first_row).each do |line|
       if line[1] == "All polls"
-        data[DateTime.parse(line[9]).strftime("%D")] = line[3]
+        data[DateTime.parse(line[9]).strftime("%d/%m/%Y")] = line[3]
       end
     end
     data.reverse_each.to_h
@@ -57,7 +92,7 @@ private
     data = {}
     CSV.new(open(dataset), :headers => :first_row).each do |line|
       if line[0] == "All polls"
-        data[DateTime.parse(line[8]).strftime("%D")] = line[2]
+        data[DateTime.parse(line[8]).strftime("%d/%m/%Y")] = line[2]
       end
     end
     data.reverse_each.to_h
@@ -71,7 +106,7 @@ private
     data = {}
     valueArr["observations"].each{ |dataInstance|
       if dataInstance["value"] != "."
-       data[DateTime.parse(dataInstance["date"]).strftime("%D")] = dataInstance["value"]
+       data[DateTime.parse(dataInstance["date"]).strftime("%d/%m/%Y")] = dataInstance["value"]
       end
     }
     data
@@ -87,6 +122,14 @@ private
     m = getMean(data)
     sum = ints.inject(0){|accum, i| accum + (i - m) ** 2 }
     Math.sqrt(sum / (ints.length - 1).to_f)
+  end
+
+  def get31days
+    days = []
+    (0..30).each{ |num|
+      days << (Date.today - num.days).strftime("%d/%m/%Y")
+    }
+    days
   end
 
 
