@@ -32,7 +32,6 @@ class Api::V1::DataRequestsController < ApplicationController
 
      }
 
-     byebug
 
 
 
@@ -48,7 +47,7 @@ private
     data = {}
     CSV.new(open(dataset), :headers => :first_row).each do |line|
       if line[1] == "All polls"
-        data[line[9]] = line[3]
+        data[DateTime.parse(line[9]).strftime("%D")] = line[3]
       end
     end
     data.reverse_each.to_h
@@ -58,7 +57,7 @@ private
     data = {}
     CSV.new(open(dataset), :headers => :first_row).each do |line|
       if line[0] == "All polls"
-        data[line[8]] = line[2]
+        data[DateTime.parse(line[8]).strftime("%D")] = line[2]
       end
     end
     data.reverse_each.to_h
@@ -70,8 +69,11 @@ private
     valueArr = JSON response.body
 
     data = {}
-    # check for zeros
-    valueArr["observations"].each{ |dataInstance| data[dataInstance["date"]] = dataInstance["value"]}
+    valueArr["observations"].each{ |dataInstance|
+      if dataInstance["value"] != "."
+       data[DateTime.parse(dataInstance["date"]).strftime("%D")] = dataInstance["value"]
+      end
+    }
     data
   end
 
