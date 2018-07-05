@@ -32,20 +32,6 @@ class Api::V1::DataRequestsController < ApplicationController
 
      }
 
-    #  go to the latest day in my list of days, find that day in each of the datasets
-    #
-    #  if that day is unavalible in a specific data set look back in time untill you get a valid value and apply it
-    #
-    #  calculate stdDev for value  and save value add it to hash / array
-    #
-    #  repeat for all values
-    #
-    # go through each day and calucalte doom index with weights
-    #
-    # return array of 30 day doom index
-
-
-
     index = get31days.map{ |day|
       indexValueSet = dataPackage.map{ |dataset|
 
@@ -68,7 +54,7 @@ class Api::V1::DataRequestsController < ApplicationController
         end
         indexValuePartial
        }
-       indexValueSet.inject(0, :+)
+       {day=>indexValueSet.inject(0, :+)}
      }
 
     render json: index
