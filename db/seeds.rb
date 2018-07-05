@@ -22,3 +22,4 @@ sp2 = Dataset.create(name: "10-Year Treasury Minus 2-Year Treasury", srcName: "F
 dandata1 = UserDataset.create(user_id: user1.id, dataset_id: five38.id, weight: 1)
 dandata2 = UserDataset.create(user_id: user1.id, dataset_id: five38_2.id, weight: 4)
 amydata1 = UserDataset.create(user_id: user2.id, dataset_id: five38.id, weight: 3)
+amydata2 = UserDataset.create(user_id: user2.id, dataset_id: five38_2.id, weight: 3, positive_corral: false )

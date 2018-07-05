@@ -1,6 +1,5 @@
 class Api::V1::DataRequestsController < ApplicationController
 
-
   def index
     #
     render json: @data
