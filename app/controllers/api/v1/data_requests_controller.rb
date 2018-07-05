@@ -15,6 +15,8 @@ class Api::V1::DataRequestsController < ApplicationController
 
     @datasets = @userDatasets.map{ |user_data| Dataset.where("id = #{user_data.dataset_id}")[0]}
 
+    #basedoom value
+    baseDoom = 5
 
     dataPackage = @datasets.map{ |dataset|
 
@@ -54,7 +56,7 @@ class Api::V1::DataRequestsController < ApplicationController
         end
         indexValuePartial
        }
-       {day=>indexValueSet.inject(0, :+)}
+       {day=>(indexValueSet.inject(0, :+) + baseDoom)}
      }
 
     render json: index
