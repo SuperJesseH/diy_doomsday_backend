@@ -55,6 +55,7 @@ class Api::V1::DataRequestsController < ApplicationController
 
         indexValuePartial = 0
 
+        #if this day has a value in the dataset calculate the # of standard deviations from the mean it is, mulitply by the weight and multiplu by -1 if the indication is negatively related to doom --- else seek a value from the previous 10 days
         if dataset[:data][day]
           indexValuePartial = (((dataset[:data][day].to_f - dataset[:mean]) / dataset[:stdDev]) * dataRelationship.weight) * relationshipVector
         else

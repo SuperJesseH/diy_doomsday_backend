@@ -30,7 +30,7 @@ ActiveRecord::Schema.define(version: 2018_06_27_134649) do
   create_table "user_datasets", force: :cascade do |t|
     t.integer "user_id"
     t.integer "dataset_id"
-    t.boolean "positive_corral"
+    t.boolean "positive_corral", default: true
     t.float "weight"
     t.string "notes"
     t.datetime "created_at", null: false
