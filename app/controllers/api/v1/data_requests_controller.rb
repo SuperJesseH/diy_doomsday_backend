@@ -2,29 +2,37 @@ class Api::V1::DataRequestsController < ApplicationController
 
 
   def index
-    #grab all avalible datasets
-    @data = {day1:123, day2:12345}
-    #send all datasets to client in JSON format
+    #
     render json: @data
   end
 
   def show
     # make a request for the 3rd party data as described in dataset
-    @dataset = Dataset.find(params["id"])
+    #get ID from user calculate 30 days of index and return values
+    @user = User.find(params["id"])
 
-    if @dataset.name == "Presidential Approval"
-      data = proccesPresApproval(@dataset.srcAddress)
-      dataPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data)}
-    elsif @dataset.name == "Generic Ballot"
-      data = proccesGenericBallot(@dataset.srcAddress)
-      dataPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data)}
-    elsif @dataset.name == "S&P 500 Volatility"
-      data = proccesFRED(@dataset.srcAddress)
-      dataPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data)}
-    elsif @dataset.name == "10-Year Treasury Minus 2-Year Treasury"
-      data = proccesFRED(@dataset.srcAddress)
-      dataPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data)}
-    end
+    @userDatasets = UserDataset.where("user_id = #{@user.id}")
+
+    @datasets = @userDatasets.map{ |user_data| Dataset.where("id = #{user_data.dataset_id}")[0]}
+
+
+    dataPackage = @datasets.map{ |dataset|
+
+      if dataset.name == "Presidential Approval"
+        data = proccesPresApproval(dataset.srcAddress)
+      elsif dataset.name == "Generic Ballot"
+        data = proccesGenericBallot(dataset.srcAddress)
+      elsif dataset.name == "S&P 500 Volatility"
+        data = proccesFRED(dataset.srcAddress)
+      elsif dataset.name == "10-Year Treasury Minus 2-Year Treasury"
+        data = proccesFRED(dataset.srcAddress)
+      end
+
+      dataForPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data), name:dataset.name, id:dataset.id}
+
+     }
+
+
 
     render json: dataPackage
   end
