@@ -19,6 +19,7 @@ class Api::V1::UserDatasetsController < ApplicationController
     @userSet = UserDataset.where(:user_id => params["user_id"], :dataset_id => params["dataset_id"]).first_or_create
 
     @userSet.weight = params["weight"]
+    @userSet.positive_corral = params["positive_corral"]
 
     @userSet.save
 
