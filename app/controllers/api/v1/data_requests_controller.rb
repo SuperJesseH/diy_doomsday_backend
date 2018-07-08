@@ -12,6 +12,13 @@ class Api::V1::DataRequestsController < ApplicationController
 
     @userDatasets = UserDataset.where("user_id = #{@user.id}")
 
+    weights = @userDatasets.map{ |set|
+        puts set.weight
+        set.weight
+     }
+     totalWeights = weights.inject(0, :+)
+
+
     @datasets = @userDatasets.map{ |user_data| Dataset.where("id = #{user_data.dataset_id}")[0]}
 
     #basedoom value
@@ -42,6 +49,7 @@ class Api::V1::DataRequestsController < ApplicationController
 
         indexValuePartial = 0
 
+
         #if this day has a value in the dataset calculate the # of standard deviations from the mean it is, mulitply by the weight and multiplu by -1 if the indication is negatively related to doom --- else seek a value from the previous 10 days
         if dataset[:data][day]
           # puts dataset[:data][day]
@@ -58,7 +66,7 @@ class Api::V1::DataRequestsController < ApplicationController
         end
         indexValuePartial
        }
-       {day=>(indexValueSet.inject(0, :+) + baseDoom)}
+       {day=>(((indexValueSet.inject(0, :+))/totalWeights) + baseDoom)}
      }
 
     render json: index
