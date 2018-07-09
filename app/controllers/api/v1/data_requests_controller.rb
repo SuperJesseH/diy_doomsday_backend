@@ -23,6 +23,7 @@ class Api::V1::DataRequestsController < ApplicationController
     index = get31days.map{ |day|
       indexValueSet = dataPackage.map{ |dataset|
         dataRelationship = @userDatasets.find{ |userdataset| userdataset.dataset_id == dataset[:id]}
+
         relationshipVector = (dataRelationship.positive_corral ? 1 : -1)
         indexValuePartial = 0
 
@@ -147,20 +148,28 @@ private
   def getDataSets
     # routes all datasets to the appropreate request and formatting funcntion
     @datasets.map{ |dataset|
-      if dataset.name == "Presidential Approval"
-        data = proccesPresApproval(dataset.srcAddress)
-      elsif dataset.name == "Generic Ballot"
-        data = proccesGenericBallot(dataset.srcAddress)
-      elsif dataset.name == "S&P 500 Volatility"
-        data = proccesFRED(dataset.srcAddress)
-      elsif dataset.name == "Sea Ice Extent"
-        data = proccessSeaIce(dataset.srcAddress)
-      elsif dataset.name == "10Yr Treasury Minus 2Yr"
-        data = proccesFRED(dataset.srcAddress)
+      if Time.now - dataset.updated_at > 21600 || !dataset.notes
+        puts "REFRESHING DATA"
+        if dataset.name == "Presidential Approval"
+          data = proccesPresApproval(dataset.srcAddress)
+        elsif dataset.name == "Generic Ballot"
+          data = proccesGenericBallot(dataset.srcAddress)
+        elsif dataset.name == "S&P 500 Volatility"
+          data = proccesFRED(dataset.srcAddress)
+        elsif dataset.name == "Sea Ice Extent"
+          data = proccessSeaIce(dataset.srcAddress)
+        elsif dataset.name == "10Yr Treasury Minus 2Yr"
+          data = proccesFRED(dataset.srcAddress)
+        else
+          puts "INCORRECT DATASET NAME"
+        end
+        dataForPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data), name:dataset.name, id:dataset.id}
+        dataset.notes = dataForPackage.to_json
+        dataset.save
       else
-        puts "INCORRECT DATASET NAME"
+        dataForPackage = JSON.parse(dataset.notes)
       end
-      dataForPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data), name:dataset.name, id:dataset.id}
+      dataForPackage.symbolize_keys
      }
   end
 
