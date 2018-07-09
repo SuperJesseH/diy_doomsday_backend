@@ -90,6 +90,31 @@ private
     data
   end
 
+  def proccessSeaIce(dataset)
+    puts "START ICE REQUEST"
+    xlsx = Roo::Spreadsheet.open("lib/Sea_Ice_Index_Daily_Extent_G02135_v3.0.xlsx")
+    puts "GOT ICE REQUEST"
+    anomData = xlsx.sheet('NH-5-Day-Anomaly')
+    lastColumn = anomData.last_column
+    valueArr = []
+    puts "START ICE ITERATION"
+    anomData.column(lastColumn).each_with_index{ |dataPoint, index|
+      if index > 0 && (anomData.column(lastColumn)[index] || anomData.column(lastColumn)[index+1])
+        if dataPoint != nil
+          valueArr << dataPoint
+        else
+          valueArr << anomData.column(lastColumn)[index-1]
+        end
+      end
+     }
+     puts "END ICE ITERATION"
+     data = {}
+     valueArr.each_with_index{ |value, index|
+       data[(Date.today - (valueArr.length - index)).strftime("%d/%m/%Y")] = value
+       }
+     data
+  end
+
   def getMean(data)
     #calculates an avarage value from an array of hashes [{date:value}, {date:value}]
     ints = data.values.map{ |val| val.to_f}
@@ -120,7 +145,7 @@ private
   end
 
   def getDataSets
-    # routes all datasets to the appropreate request and formatting fucntion 
+    # routes all datasets to the appropreate request and formatting funcntion
     @datasets.map{ |dataset|
       if dataset.name == "Presidential Approval"
         data = proccesPresApproval(dataset.srcAddress)
@@ -128,8 +153,12 @@ private
         data = proccesGenericBallot(dataset.srcAddress)
       elsif dataset.name == "S&P 500 Volatility"
         data = proccesFRED(dataset.srcAddress)
-      elsif dataset.name == "10-Year Treasury Minus 2-Year Treasury"
+      elsif dataset.name == "Sea Ice Extent"
+        data = proccessSeaIce(dataset.srcAddress)
+      elsif dataset.name == "10Yr Treasury Minus 2Yr"
         data = proccesFRED(dataset.srcAddress)
+      else
+        puts "INCORRECT DATASET NAME"
       end
       dataForPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data), name:dataset.name, id:dataset.id}
      }

@@ -17,7 +17,9 @@ five38_2 = Dataset.create(name: "Generic Ballot", srcName: "FiveThirtyEight", sr
 
 sp1 = Dataset.create(name: "S&P 500 Volatility", srcName: "FRED", srcAddress: "https://api.stlouisfed.org/fred/series/observations?series_id=VXVCLS&api_key=#{ENV['FRED_SECRET']}&file_type=json", desc:"Measures price volatility among the 500 largest publicly traded companies in the U.S.", normalizer:"percent")
 
-sp2 = Dataset.create(name: "10-Year Treasury Minus 2-Year Treasury", srcName: "FRED", srcAddress: "https://api.stlouisfed.org/fred/series/observations?series_id=T10Y2Y&api_key=#{ENV['FRED_SECRET']}&file_type=json", desc:"A high value indicates expectations for faster economic growth in the future", normalizer:"percent")
+sp2 = Dataset.create(name: "10Yr Treasury Minus 2Yr", srcName: "FRED", srcAddress: "https://api.stlouisfed.org/fred/series/observations?series_id=T10Y2Y&api_key=#{ENV['FRED_SECRET']}&file_type=json", desc:"A high value indicates expectations for faster economic growth in the future", normalizer:"percent")
+
+seaIce = Dataset.create(name: "Sea Ice Extent", srcName: "NSIDC", srcAddress: "ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/seaice_analysis/Sea_Ice_Index_Daily_Extent_G02135_v3.0.xlsx", desc:"Measures the extent of arctic sea ice (Adds significant loading time)", normalizer:"percent")
 
 dandata1 = UserDataset.create(user_id: user1.id, dataset_id: five38.id, weight: 1)
 dandata2 = UserDataset.create(user_id: user1.id, dataset_id: five38_2.id, weight: 4)

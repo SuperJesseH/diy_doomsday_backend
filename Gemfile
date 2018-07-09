@@ -49,3 +49,6 @@ gem 'jwt'
 
 #to keep my secrets secret (keys)
 gem 'dotenv-rails'
+
+# parse .xlsx
+gem "roo", "~> 2.7.0"
