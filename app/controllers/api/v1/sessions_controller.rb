@@ -1,6 +1,7 @@
 class Api::V1::SessionsController < ApplicationController
 
   def create
+    # Allows users to authenticate and login with previously created account 
     @user = User.find_by(email:params["email"])
 
     if (@user && @user.authenticate(params["password"]))

@@ -1,64 +1,37 @@
 class Api::V1::DataRequestsController < ApplicationController
 
-  def index
-    #
-    render json: @data
-  end
-
   def show
-    # make a request for the 3rd party data as described in dataset
-    #get ID from user calculate 30 days of index and return values
+    # make a request(s) for the 3rd party data as described in dataset
+    # get ID from user calculate 30 days of index and return values
+
+    # find the current user by ID
     @user = User.find(params["id"])
 
+    #find the current users data prefrences
     @userDatasets = UserDataset.where("user_id = #{@user.id}")
 
-    weights = @userDatasets.map{ |set|
-        puts set.weight
-        set.weight
-     }
-     totalWeights = weights.inject(0, :+)
-
-
+    #find all datasets that the user has interacted with
+    #!!! consider grabbing all datasets rather than this subset !!!
     @datasets = @userDatasets.map{ |user_data| Dataset.where("id = #{user_data.dataset_id}")[0]}
 
-    #basedoom value
+    #basedoom value - reduces volitility in index
     baseDoom = 5
 
-    dataPackage = @datasets.map{ |dataset|
-
-      if dataset.name == "Presidential Approval"
-        data = proccesPresApproval(dataset.srcAddress)
-      elsif dataset.name == "Generic Ballot"
-        data = proccesGenericBallot(dataset.srcAddress)
-      elsif dataset.name == "S&P 500 Volatility"
-        data = proccesFRED(dataset.srcAddress)
-      elsif dataset.name == "10-Year Treasury Minus 2-Year Treasury"
-        data = proccesFRED(dataset.srcAddress)
-      end
-
-      dataForPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data), name:dataset.name, id:dataset.id}
-
-     }
+    #store data from API requests [{dataset:values},{dataset:values}]
+    dataPackage = getDataSets
 
     index = get31days.map{ |day|
       indexValueSet = dataPackage.map{ |dataset|
-
         dataRelationship = @userDatasets.find{ |userdataset| userdataset.dataset_id == dataset[:id]}
-
         relationshipVector = (dataRelationship.positive_corral ? 1 : -1)
-
         indexValuePartial = 0
 
-
-        #if this day has a value in the dataset calculate the # of standard deviations from the mean it is, mulitply by the weight and multiplu by -1 if the indication is negatively related to doom --- else seek a value from the previous 10 days
+        #if this day has a value in the dataset calculate the # of standard deviations from the mean it is, mulitply by the weight and multiply by -1 if the indicator is negatively related to doom --- else seek a value from the previous 10 days
         if dataset[:data][day]
-          # puts dataset[:data][day]
           indexValuePartial = (((dataset[:data][day].to_f - dataset[:mean]) / dataset[:stdDev]) * dataRelationship.weight) * relationshipVector
         else
           (1..10).each { |index|
              if dataset[:data][(DateTime.parse(day) - index).strftime("%d/%m/%Y")]
-               # puts dataset[:data][(DateTime.parse(day) - index).strftime("%d/%m/%Y")]
-               # puts (DateTime.parse(day) - index).strftime("%d/%m/%Y")
                indexValuePartial =(((dataset[:data][(DateTime.parse(day) - index).strftime("%d/%m/%Y")].to_f - dataset[:mean]) / dataset[:stdDev]) * dataRelationship.weight) * relationshipVector
                break
             end
@@ -66,18 +39,21 @@ class Api::V1::DataRequestsController < ApplicationController
         end
         indexValuePartial
        }
-       {day=>(((indexValueSet.inject(0, :+))/totalWeights) + baseDoom)}
+       #calcualte weighted average of proccessed values and add basedoom to determine this days index value
+       {day=>(((indexValueSet.inject(0, :+))/getTotalWeights) + baseDoom)}
      }
 
+     #send back 30 days of caluclated doom values
     render json: index
   end
 
-  def create
-  end
 
 private
 
+
   def proccesPresApproval(dataset)
+    # grabs a CSV from provided src address and standardizes it for doom index proccessing
+    # !! consider adding params and combining with proccesGenericBallot
     data = {}
     CSV.new(open(dataset), :headers => :first_row).each do |line|
       if line[1] == "All polls"
@@ -88,6 +64,8 @@ private
   end
 
   def proccesGenericBallot(dataset)
+    # grabs a CSV from provided src address and standardizes it for doom index proccessing
+    # !! consider adding params and combining with proccesPresApproval
     data = {}
     CSV.new(open(dataset), :headers => :first_row).each do |line|
       if line[0] == "All polls"
@@ -98,6 +76,7 @@ private
   end
 
   def proccesFRED(dataset)
+    #requests a JSON dataset from FRED given a source and formats for doom index proccessing
     uri = URI.parse(dataset)
     response = Net::HTTP.get_response(uri)
     valueArr = JSON response.body
@@ -112,11 +91,13 @@ private
   end
 
   def getMean(data)
+    #calculates an avarage value from an array of hashes [{date:value}, {date:value}]
     ints = data.values.map{ |val| val.to_f}
     ints.inject{ |sum, el| sum + el }.to_f / ints.size
   end
 
   def getStdVar(data)
+    #calculates a standard deviation value from an array of hashes [{date:value}, {date:value}]
     ints = data.values.map{ |val| val.to_f}
     m = getMean(data)
     sum = ints.inject(0){|accum, i| accum + (i - m) ** 2 }
@@ -124,6 +105,7 @@ private
   end
 
   def get31days
+    # produces an array of dates including today and the previous 30 days
     days = []
     (0..30).each{ |num|
       days << (Date.today - num.days).strftime("%d/%m/%Y")
@@ -131,6 +113,26 @@ private
     days
   end
 
+  def getTotalWeights
+    #calculates the total weights placed on various datasets by users
+    weights = @userDatasets.map{ |set| set.weight }
+    totalWeights = weights.inject(0, :+)
+  end
 
+  def getDataSets
+    # routes all datasets to the appropreate request and formatting fucntion 
+    @datasets.map{ |dataset|
+      if dataset.name == "Presidential Approval"
+        data = proccesPresApproval(dataset.srcAddress)
+      elsif dataset.name == "Generic Ballot"
+        data = proccesGenericBallot(dataset.srcAddress)
+      elsif dataset.name == "S&P 500 Volatility"
+        data = proccesFRED(dataset.srcAddress)
+      elsif dataset.name == "10-Year Treasury Minus 2-Year Treasury"
+        data = proccesFRED(dataset.srcAddress)
+      end
+      dataForPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data), name:dataset.name, id:dataset.id}
+     }
+  end
 
 end

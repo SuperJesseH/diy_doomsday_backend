@@ -8,5 +8,6 @@ class User < ApplicationRecord
   has_many :user_datasets
   has_many :datasets, through: :user_datasets
 
+  #!!!  add additonal validation
 
 end

@@ -7,11 +7,13 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show
+    # show specific users data
     @user = User.find(params['id'])
     render json: @user
   end
 
   def create
+    # create new user through registration page and return JWT token 
     @user=User.new(user_params)
 
     if (@user.save)
