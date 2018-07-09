@@ -21,9 +21,16 @@ class Api::V1::UserDatasetsController < ApplicationController
     @userSet.weight = params["weight"]
     @userSet.positive_corral = params["positive_corral"]
 
-    @userSet.save
+    # delete if no longer weighted 
+    if @userSet.weight > 0
+      @userSet.save
+    else
+      UserDataset.delete(@userSet.id)
+    end
 
-    render json: @userSet
+    if @userSet
+      render json: @userSet
+    end
   end
 
   #!! add strong params
