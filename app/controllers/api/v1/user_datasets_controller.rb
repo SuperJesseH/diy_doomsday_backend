@@ -17,11 +17,9 @@ class Api::V1::UserDatasetsController < ApplicationController
   def create
     # If no relationship exists create it, else update it then return specific users data and weights
     @userSet = UserDataset.where(:user_id => params["user_id"], :dataset_id => params["dataset_id"]).first_or_create
-
     @userSet.weight = params["weight"]
     @userSet.positive_corral = params["positive_corral"]
-
-    # delete if no longer weighted 
+    # delete if no longer weighted
     if @userSet.weight > 0
       @userSet.save
     else
