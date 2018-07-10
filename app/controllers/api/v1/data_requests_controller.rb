@@ -143,11 +143,17 @@ private
     #calculates the total weights placed on various datasets by users
     weights = @userDatasets.map{ |set| set.weight }
     totalWeights = weights.inject(0, :+)
+    if totalWeights == 0
+      1
+    else
+      totalWeights
+    end
   end
 
   def getDataSets
     # routes all datasets to the appropreate request and formatting funcntion
     @datasets.map{ |dataset|
+
       if Time.now - dataset.updated_at > 21600 || !dataset.notes
         puts "REFRESHING DATA"
         if dataset.name == "Presidential Approval"
@@ -166,6 +172,7 @@ private
         dataForPackage = {data:data, mean:getMean(data), stdDev:getStdVar(data), name:dataset.name, id:dataset.id}
         dataset.notes = dataForPackage.to_json
         dataset.save
+        dataset.touch
       else
         dataForPackage = JSON.parse(dataset.notes)
       end
