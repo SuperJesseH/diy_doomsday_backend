@@ -93,13 +93,13 @@ private
 
   def proccessSeaIce(dataset)
     puts "START ICE REQUEST"
-    xlsx = Roo::Spreadsheet.open("lib/Sea_Ice_Index_Daily_Extent_G02135_v3.0.xlsx")
+    xlsx = Roo::Spreadsheet.open(dataset)
     puts "GOT ICE REQUEST"
     anomData = xlsx.sheet('NH-5-Day-Anomaly')
     lastColumn = anomData.last_column
     valueArr = []
     puts "START ICE ITERATION"
-    anomData.column(lastColumn).each_with_index{ |dataPoint, index|
+    anomData.column(lastColumn).each_with_index { |dataPoint, index|
       if index > 0 && (anomData.column(lastColumn)[index] || anomData.column(lastColumn)[index+1])
         if dataPoint != nil
           valueArr << dataPoint
@@ -112,7 +112,7 @@ private
      data = {}
      valueArr.each_with_index{ |value, index|
        data[(Date.today - (valueArr.length - index)).strftime("%d/%m/%Y")] = value
-       }
+     }
      data
   end
 
