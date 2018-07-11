@@ -82,7 +82,7 @@ private
     response = Net::HTTP.get_response(uri)
     valueArr = JSON response.body
     puts "PRINTING WHAT IVE GOT --------------------"
-    puts valueARR
+    puts valueArr
     data = {}
     valueArr["observations"].each{ |dataInstance|
       if dataInstance["value"] != "."
