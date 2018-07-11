@@ -52,3 +52,5 @@ gem 'dotenv-rails'
 
 # parse .xlsx
 gem "roo", "~> 2.7.0"
+
+gem 'active_model_serializers', '~> 0.10.7'
