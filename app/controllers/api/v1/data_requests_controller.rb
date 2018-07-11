@@ -81,7 +81,7 @@ private
     uri = URI.parse(dataset)
     response = Net::HTTP.get_response(uri)
     valueArr = JSON response.body
-
+    byebug
     data = {}
     valueArr["observations"].each{ |dataInstance|
       if dataInstance["value"] != "."
