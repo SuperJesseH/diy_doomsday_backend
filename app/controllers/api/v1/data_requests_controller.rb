@@ -156,15 +156,17 @@ private
 
       if Time.now - dataset.updated_at > 21600 || !dataset.notes
         puts "REFRESHING DATA"
-        if dataset.name == "Presidential Approval"
+        if dataset.name == "Presidential Approval Rating"
           data = proccesPresApproval(dataset.srcAddress)
-        elsif dataset.name == "Generic Ballot"
+        elsif dataset.name == "Voter Preference for Democratic Candidates"
           data = proccesGenericBallot(dataset.srcAddress)
-        elsif dataset.name == "S&P 500 Volatility"
+        elsif dataset.name == "Stock Market Volatility"
           data = proccesFRED(dataset.srcAddress)
-        elsif dataset.name == "Sea Ice Extent"
+        elsif dataset.name == "Polar Ice Growth"
           data = proccessSeaIce(dataset.srcAddress)
-        elsif dataset.name == "10Yr Treasury Minus 2Yr"
+        elsif dataset.name == "Yeild Curve"
+          data = proccesFRED(dataset.srcAddress)
+        elsif dataset.name == "Inflation Rate"
           data = proccesFRED(dataset.srcAddress)
         else
           puts "INCORRECT DATASET NAME"
